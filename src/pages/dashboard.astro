@@ -1,0 +1,455 @@
+---
+import Layout from '../layouts/Layout.astro';
+// Página estática: autenticación y datos se resuelven en el navegador,
+// leyendo y escribiendo DIRECTO en Supabase con la anon key + RLS.
+---
+
+<Layout title="CRM de Leads — Innovatar" description="Panel interno de gestión de leads.">
+  <div class="admin">
+    <!-- ===== LOGIN ===== -->
+    <section id="login-view" class="login-wrap" hidden>
+      <div class="login-card">
+        <div class="brand">
+          <span class="logo-mark">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M5 12a7 7 0 0 1 7-7M9 12a3 3 0 0 1 3-3"/><circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none"/></svg>
+          </span>
+          <span class="logo-text">INNOVA<span class="logo-accent">TAR</span></span>
+        </div>
+        <h1>CRM de Leads</h1>
+        <p class="muted">Acceso solo para el equipo de Innovatar.</p>
+        <form id="login-form">
+          <label>Email<input type="email" id="email" placeholder="tu@innovatar.cl" required /></label>
+          <label>Contraseña<input type="password" id="password" placeholder="••••••••" required /></label>
+          <button type="submit" class="btn-primary" style="justify-content:center" id="login-btn">Iniciar sesión</button>
+          <p id="login-error" class="login-error" hidden></p>
+        </form>
+        <p class="hint">¿Sin cuenta? Créala en Supabase → Authentication → Users.</p>
+      </div>
+    </section>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section id="dash-view" hidden>
+      <header class="topbar">
+        <div class="brand">
+          <span class="logo-mark">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M5 12a7 7 0 0 1 7-7M9 12a3 3 0 0 1 3-3"/><circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none"/></svg>
+          </span>
+          <span class="logo-text">INNOVA<span class="logo-accent">TAR</span> · CRM</span>
+        </div>
+        <div class="topbar-right">
+          <span id="user-email" class="user-email"></span>
+          <button id="refresh-btn" class="btn-ghost" style="padding:8px 14px;font-size:.82rem">↻ Actualizar</button>
+          <button id="logout-btn" class="btn-ghost" style="padding:8px 14px;font-size:.82rem">Salir</button>
+        </div>
+      </header>
+
+      <main class="dash-main">
+        <div class="cards" id="summary"></div>
+
+        <div class="toolbar">
+          <input type="search" id="search" placeholder="Buscar por nombre, teléfono o servicio..." />
+          <select id="origen-filter" class="select-sm">
+            <option value="todos">Todos los orígenes</option>
+            <option value="home_form">Form Home</option>
+            <option value="cotizar">Cotizar</option>
+            <option value="diagnostico">Diagnóstico</option>
+          </select>
+          <div class="view-toggle">
+            <button class="vt-btn active" data-view="tabla">☰ Tabla</button>
+            <button class="vt-btn" data-view="kanban">▦ Kanban</button>
+          </div>
+        </div>
+
+        <div class="estado-filters" id="estado-filters"></div>
+
+        <!-- TABLE VIEW -->
+        <div class="table-wrap" id="table-view">
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Nombre</th><th>Contacto</th><th>Servicios</th><th>Origen</th><th>Urgencia</th><th>Estado</th></tr>
+            </thead>
+            <tbody id="leads-body"></tbody>
+          </table>
+          <div id="empty" class="empty" hidden></div>
+          <div id="loading" class="empty">Cargando leads…</div>
+        </div>
+
+        <!-- KANBAN VIEW -->
+        <div class="kanban" id="kanban-view" hidden></div>
+      </main>
+    </section>
+
+    <!-- ===== MODAL ===== -->
+    <div id="modal" class="modal" hidden>
+      <div class="modal-backdrop" id="modal-backdrop"></div>
+      <div class="modal-card" id="modal-card"></div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .admin { min-height: 100vh; }
+  .muted { color: var(--c-text-muted); }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .logo-mark { width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, #0EA5E9, #0369A1);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-text { font-weight: 900; font-size: 0.95rem; letter-spacing: -0.03em; }
+  .logo-accent { color: #0EA5E9; }
+
+  /* LOGIN */
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .login-card { width: 100%; max-width: 400px; background: var(--color-ink-card);
+    border: 1px solid var(--c-border); border-radius: 20px; padding: 36px; backdrop-filter: blur(16px); }
+  .login-card h1 { font-size: 1.5rem; font-weight: 800; margin: 22px 0 6px; }
+  .login-card form { display: flex; flex-direction: column; gap: 14px; margin-top: 24px; }
+  .login-card label { display: flex; flex-direction: column; gap: 7px; font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+  .login-error { color: #F87171; font-size: 0.85rem; text-align: center; }
+  .hint { font-size: 0.78rem; color: var(--c-text-faint); margin-top: 18px; text-align: center; }
+  input, .select-sm, textarea, select { background: rgba(255,255,255,0.04); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px 14px; color: #fff; font-family: inherit; font-size: 0.95rem; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(14,165,233,0.12); }
+  select option { background: #0A1428; }
+
+  /* TOPBAR */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px;
+    border-bottom: 1px solid var(--c-border); background: rgba(6,11,23,0.85); backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 50; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .user-email { font-size: 0.82rem; color: var(--c-text-muted); }
+  .dash-main { max-width: 1280px; margin: 0 auto; padding: 28px; }
+
+  /* CARDS */
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .card { background: var(--color-ink-card); border: 1px solid var(--c-border); border-radius: 14px; padding: 18px 20px; }
+  .card .num { font-size: 1.9rem; font-weight: 900; letter-spacing: -0.03em; line-height: 1; }
+  .card .lbl { font-size: 0.75rem; color: var(--c-text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  #search { flex: 1; min-width: 220px; width: auto; }
+  .select-sm { padding: 10px 12px; font-size: 0.85rem; }
+  .view-toggle { display: flex; background: rgba(255,255,255,0.04); border: 1px solid var(--c-border); border-radius: 10px; overflow: hidden; }
+  .vt-btn { background: none; border: none; color: var(--c-text-muted); padding: 9px 16px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .vt-btn.active { background: rgba(14,165,233,0.15); color: #38BDF8; }
+
+  .estado-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .filter-chip { background: rgba(255,255,255,0.05); border: 1px solid var(--c-border); border-radius: 8px;
+    padding: 6px 12px; font-size: 0.78rem; font-weight: 600; color: var(--c-text-muted); cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+  .filter-chip.active { background: rgba(255,255,255,0.1); color: #fff; border-color: var(--c-border-hover); }
+  .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* TABLE */
+  .table-wrap { background: var(--color-ink-card); border: 1px solid var(--c-border); border-radius: 16px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--c-text-muted); font-weight: 700; padding: 14px 18px; border-bottom: 1px solid var(--c-border); }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; transition: background .15s; }
+  tbody tr:hover { background: rgba(14,165,233,0.05); }
+  tbody td { padding: 14px 18px; font-size: 0.88rem; vertical-align: middle; }
+  .cell-name { font-weight: 700; }
+  .cell-sub { font-size: 0.78rem; color: var(--c-text-muted); }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; }
+  .b-origen { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); }
+  .urg { display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; font-weight: 600; }
+  .empty { padding: 48px; text-align: center; color: var(--c-text-muted); font-size: 0.95rem; }
+
+  /* KANBAN */
+  .kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 1fr); gap: 14px; overflow-x: auto; padding-bottom: 12px; }
+  .kan-col { background: rgba(255,255,255,0.02); border: 1px solid var(--c-border); border-radius: 14px; padding: 14px; min-height: 200px; }
+  .kan-head { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
+  .kan-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .kan-count { margin-left: auto; background: rgba(255,255,255,0.08); border-radius: 20px; padding: 1px 9px; font-size: 0.72rem; color: var(--c-text-muted); }
+  .kan-body { display: flex; flex-direction: column; gap: 10px; min-height: 80px; border-radius: 10px; transition: background .15s; padding: 4px; }
+  .kan-body.drop-active { background: rgba(14,165,233,0.08); outline: 1px dashed rgba(14,165,233,0.4); }
+  .kan-card { background: var(--color-ink-card); border: 1px solid var(--c-border); border-radius: 11px; padding: 13px; cursor: grab; transition: border-color .2s, transform .1s; }
+  .kan-card:hover { border-color: rgba(14,165,233,0.3); }
+  .kan-card.dragging { opacity: 0.5; cursor: grabbing; }
+  .kan-card-name { font-weight: 700; font-size: 0.88rem; }
+  .kan-card-sub { font-size: 0.76rem; color: var(--c-text-muted); margin: 4px 0 8px; }
+  .kan-card-meta { font-size: 0.74rem; color: var(--c-text-muted); display: flex; gap: 6px; align-items: center; }
+
+  /* MODAL */
+  .modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+  .modal-card { position: relative; width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+    background: #0A1428; border: 1px solid var(--c-border); border-radius: 20px; padding: 28px; }
+  .modal-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+  .me-field { display: flex; flex-direction: column; gap: 7px; }
+  .me-field label { font-size: 0.74rem; font-weight: 700; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .modal-row { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.88rem; }
+  .modal-row .k { color: var(--c-text-muted); width: 120px; flex-shrink: 0; font-weight: 600; }
+  .modal-row .v { color: #fff; word-break: break-word; }
+  .modal-close { position: absolute; top: 18px; right: 18px; background: rgba(255,255,255,0.06);
+    border: 1px solid var(--c-border); border-radius: 8px; width: 32px; height: 32px; color: #fff; cursor: pointer; font-size: 1.1rem; }
+  textarea { width: 100%; resize: vertical; min-height: 80px; }
+  .save-row { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+  .save-ok { color: #34D399; font-size: 0.82rem; }
+
+  @media (max-width: 880px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .dash-main { padding: 18px; }
+    .modal-grid { grid-template-columns: 1fr; }
+    thead { display: none; }
+    tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; padding: 14px 16px; }
+    tbody td { padding: 2px 0; }
+  }
+</style>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const SUPABASE_ANON = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+  const ESTADOS = [
+    { key: 'nuevo',      label: 'Nuevo',      color: '#0EA5E9' },
+    { key: 'contactado', label: 'Contactado', color: '#F59E0B' },
+    { key: 'cotizado',   label: 'Cotizado',   color: '#8B5CF6' },
+    { key: 'ganado',     label: 'Ganado',     color: '#10B981' },
+    { key: 'perdido',    label: 'Perdido',    color: '#EF4444' },
+  ];
+  const estadoColor = (k: string) => (ESTADOS.find((e) => e.key === k)?.color) || '#94A3B8';
+  const estadoLabel = (k: string) => (ESTADOS.find((e) => e.key === k)?.label) || k;
+
+  const $ = (id: string) => document.getElementById(id)!;
+  const loginView = $('login-view');
+  const dashView = $('dash-view');
+
+  if (!SUPABASE_URL || !SUPABASE_ANON) {
+    loginView.hidden = false;
+    $('login-error').hidden = false;
+    $('login-error').textContent = 'Faltan PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_ANON_KEY en .env';
+  }
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let allLeads: any[] = [];
+  let activeEstado = 'todos';
+  let currentView: 'tabla' | 'kanban' = 'tabla';
+
+  // ── Auth ───────────────────────────────────────────────
+  async function init() {
+    const { data: { session } } = await supabase.auth.getSession();
+    session ? showDashboard(session) : showLogin();
+  }
+  function showLogin() { loginView.hidden = false; dashView.hidden = true; }
+  async function showDashboard(session: any) {
+    loginView.hidden = true; dashView.hidden = false;
+    $('user-email').textContent = session.user?.email ?? '';
+    await loadLeads();
+  }
+
+  $('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('login-btn') as HTMLButtonElement;
+    const err = $('login-error');
+    err.hidden = true; btn.disabled = true; btn.textContent = 'Ingresando…';
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: ($('email') as HTMLInputElement).value.trim(),
+      password: ($('password') as HTMLInputElement).value,
+    });
+    btn.disabled = false; btn.textContent = 'Iniciar sesión';
+    if (error) { err.hidden = false; err.textContent = 'Credenciales incorrectas o usuario no existe.'; return; }
+    showDashboard(data.session);
+  });
+  $('logout-btn').addEventListener('click', async () => { await supabase.auth.signOut(); showLogin(); });
+  $('refresh-btn').addEventListener('click', loadLeads);
+
+  // ── Data ───────────────────────────────────────────────
+  async function loadLeads() {
+    $('loading').hidden = false; $('empty').hidden = true;
+    const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+    $('loading').hidden = true;
+    if (error) { $('empty').hidden = false; $('empty').textContent = 'Error al cargar: ' + error.message; return; }
+    allLeads = data ?? [];
+    renderAll();
+  }
+
+  async function updateLead(id: string, patch: Record<string, any>) {
+    const { error } = await supabase.from('leads').update(patch).eq('id', id);
+    if (error) { alert('No se pudo guardar: ' + error.message); return false; }
+    const lead = allLeads.find((l) => l.id === id);
+    if (lead) Object.assign(lead, patch);
+    renderAll();
+    return true;
+  }
+
+  // ── Render orchestration ───────────────────────────────
+  function renderAll() {
+    renderSummary();
+    renderEstadoFilters();
+    $('table-view').hidden = currentView !== 'tabla';
+    $('kanban-view').hidden = currentView !== 'kanban';
+    $('estado-filters').style.display = currentView === 'tabla' ? 'flex' : 'none';
+    currentView === 'tabla' ? renderTable() : renderKanban();
+  }
+
+  function filtered() {
+    const q = ($('search') as HTMLInputElement).value.toLowerCase().trim();
+    const origen = ($('origen-filter') as HTMLSelectElement).value;
+    return allLeads.filter((l) => {
+      if (origen !== 'todos' && l.origen !== origen) return false;
+      if (!q) return true;
+      return [l.nombre, l.telefono, l.email, (l.servicios || []).join(' ')].join(' ').toLowerCase().includes(q);
+    });
+  }
+
+  function renderSummary() {
+    const now = new Date();
+    const today = allLeads.filter((l) => new Date(l.created_at).toDateString() === now.toDateString()).length;
+    const nuevos = allLeads.filter((l) => (l.estado || 'nuevo') === 'nuevo').length;
+    const ganados = allLeads.filter((l) => l.estado === 'ganado').length;
+    const cards = [
+      { num: allLeads.length, lbl: 'Total leads', color: '#fff' },
+      { num: today, lbl: 'Hoy', color: '#38BDF8' },
+      { num: nuevos, lbl: 'Sin contactar', color: '#F59E0B' },
+      { num: ganados, lbl: 'Ganados', color: '#10B981' },
+    ];
+    $('summary').innerHTML = cards.map((c) =>
+      `<div class="card"><div class="num" style="color:${c.color}">${c.num}</div><div class="lbl">${c.lbl}</div></div>`).join('');
+  }
+
+  function renderEstadoFilters() {
+    const opts = [{ key: 'todos', label: 'Todos', color: '#94A3B8' }, ...ESTADOS];
+    $('estado-filters').innerHTML = opts.map((o) =>
+      `<button class="filter-chip ${o.key === activeEstado ? 'active' : ''}" data-estado="${o.key}">
+        <span class="chip-dot" style="background:${o.color}"></span>${o.label}</button>`).join('');
+    document.querySelectorAll<HTMLButtonElement>('#estado-filters .filter-chip').forEach((b) =>
+      b.addEventListener('click', () => { activeEstado = b.dataset.estado!; renderEstadoFilters(); renderTable(); }));
+  }
+
+  function renderTable() {
+    let rows = filtered();
+    if (activeEstado !== 'todos') rows = rows.filter((l) => (l.estado || 'nuevo') === activeEstado);
+    const body = $('leads-body');
+    $('empty').hidden = rows.length > 0;
+    if (rows.length === 0) $('empty').textContent = allLeads.length ? 'Ningún lead coincide con el filtro.' : 'Aún no hay leads.';
+    body.innerHTML = rows.map((l) => `
+      <tr data-id="${l.id}">
+        <td class="cell-sub">${fmtDate(l.created_at)}</td>
+        <td><div class="cell-name">${esc(l.nombre)}</div>${l.empresa ? `<div class="cell-sub">${esc(l.empresa)}</div>` : ''}</td>
+        <td>${esc(l.telefono)}${l.email ? `<div class="cell-sub">${esc(l.email)}</div>` : ''}</td>
+        <td class="cell-sub">${(l.servicios || []).join(', ') || '—'}</td>
+        <td><span class="badge b-origen">${labelOrigen(l.origen)}</span></td>
+        <td>${urgencia(l.urgencia)}</td>
+        <td><span class="badge" style="background:${estadoColor(l.estado || 'nuevo')}22;color:${estadoColor(l.estado || 'nuevo')}">${estadoLabel(l.estado || 'nuevo')}</span></td>
+      </tr>`).join('');
+    body.querySelectorAll<HTMLTableRowElement>('tr').forEach((tr) =>
+      tr.addEventListener('click', () => openModal(allLeads.find((l) => l.id === tr.dataset.id))));
+  }
+
+  let dragId: string | null = null;
+  function renderKanban() {
+    const rows = filtered();
+    $('kanban-view').innerHTML = ESTADOS.map((est) => {
+      const items = rows.filter((l) => (l.estado || 'nuevo') === est.key);
+      return `<div class="kan-col">
+        <div class="kan-head"><span class="kan-dot" style="background:${est.color}"></span>${est.label}<span class="kan-count">${items.length}</span></div>
+        <div class="kan-body" data-estado="${est.key}">
+          ${items.map((l) => `
+            <div class="kan-card" draggable="true" data-id="${l.id}">
+              <div class="kan-card-name">${esc(l.nombre)}</div>
+              <div class="kan-card-sub">${(l.servicios || []).join(', ') || '—'}</div>
+              <div class="kan-card-meta">${urgencia(l.urgencia)} · ${labelOrigen(l.origen)}</div>
+            </div>`).join('')}
+        </div></div>`;
+    }).join('');
+
+    $('kanban-view').querySelectorAll<HTMLElement>('.kan-card').forEach((card) => {
+      card.addEventListener('dragstart', () => { dragId = card.dataset.id!; card.classList.add('dragging'); });
+      card.addEventListener('dragend', () => card.classList.remove('dragging'));
+      card.addEventListener('click', () => openModal(allLeads.find((l) => l.id === card.dataset.id)));
+    });
+    $('kanban-view').querySelectorAll<HTMLElement>('.kan-body').forEach((col) => {
+      col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drop-active'); });
+      col.addEventListener('dragleave', () => col.classList.remove('drop-active'));
+      col.addEventListener('drop', async (e) => {
+        e.preventDefault(); col.classList.remove('drop-active');
+        const id = dragId; const nuevo = col.dataset.estado!;
+        dragId = null;
+        const lead = allLeads.find((l) => l.id === id);
+        if (id && lead && (lead.estado || 'nuevo') !== nuevo) await updateLead(id, { estado: nuevo });
+      });
+    });
+  }
+
+  // ── Modal (editable) ───────────────────────────────────
+  function openModal(l: any) {
+    if (!l) return;
+    const info: [string, string][] = [
+      ['Fecha', fmtDate(l.created_at, true)],
+      ['Teléfono', l.telefono], ['Email', l.email || '—'],
+      ['Empresa', l.empresa || '—'], ['Región', l.region || '—'],
+      ['Segmento', l.segmento || '—'], ['Servicios', (l.servicios || []).join(', ') || '—'],
+      ['Urgencia', l.urgencia || '—'], ['Origen', labelOrigen(l.origen)],
+      ['Mensaje', l.mensaje || '—'], ['Descripción', l.descripcion || '—'],
+    ];
+    $('modal-card').innerHTML = `
+      <button class="modal-close" id="modal-x">×</button>
+      <h3>${esc(l.nombre)}</h3>
+      <p class="muted" style="margin-bottom:4px">${(l.servicios || []).join(', ')}</p>
+      <div class="modal-grid">
+        <div class="me-field"><label>Estado</label>
+          <select id="me-estado">${ESTADOS.map((e) => `<option value="${e.key}" ${(l.estado || 'nuevo') === e.key ? 'selected' : ''}>${e.label}</option>`).join('')}</select>
+        </div>
+        <div class="me-field"><label>Acción rápida</label>
+          <a href="https://wa.me/${(l.telefono || '').replace(/[^0-9]/g, '')}" target="_blank" rel="noopener" class="btn-whatsapp" style="justify-content:center;padding:11px">💬 WhatsApp</a>
+        </div>
+      </div>
+      <div class="me-field"><label>Notas de seguimiento</label>
+        <textarea id="me-notas" placeholder="Ej: Llamado el 12/06, pidio cotizacion formal...">${esc(l.notas || '')}</textarea>
+      </div>
+      <div class="save-row">
+        <button class="btn-primary" id="me-save" style="padding:11px 22px">Guardar cambios</button>
+        <span class="save-ok" id="me-saved" hidden>✓ Guardado</span>
+      </div>
+      <div style="margin-top:22px">
+        ${info.map(([k, v]) => `<div class="modal-row"><span class="k">${k}</span><span class="v">${esc(String(v))}</span></div>`).join('')}
+      </div>`;
+    $('modal').hidden = false;
+    $('modal-x').addEventListener('click', closeModal);
+    $('me-save').addEventListener('click', async () => {
+      const btn = $('me-save') as HTMLButtonElement;
+      btn.disabled = true; btn.textContent = 'Guardando…';
+      const ok = await updateLead(l.id, {
+        estado: ($('me-estado') as HTMLSelectElement).value,
+        notas: ($('me-notas') as HTMLTextAreaElement).value.trim() || null,
+      });
+      btn.disabled = false; btn.textContent = 'Guardar cambios';
+      if (ok) { const s = $('me-saved'); s.hidden = false; setTimeout(() => closeModal(), 700); }
+    });
+  }
+  function closeModal() { $('modal').hidden = true; }
+  $('modal-backdrop').addEventListener('click', closeModal);
+
+  // ── Toolbar events ─────────────────────────────────────
+  $('search').addEventListener('input', () => (currentView === 'tabla' ? renderTable() : renderKanban()));
+  $('origen-filter').addEventListener('change', () => (currentView === 'tabla' ? renderTable() : renderKanban()));
+  document.querySelectorAll<HTMLButtonElement>('.vt-btn').forEach((b) =>
+    b.addEventListener('click', () => {
+      currentView = b.dataset.view as 'tabla' | 'kanban';
+      document.querySelectorAll('.vt-btn').forEach((x) => x.classList.toggle('active', x === b));
+      renderAll();
+    }));
+
+  // ── Helpers ────────────────────────────────────────────
+  function fmtDate(iso: string, full = false) {
+    const d = new Date(iso);
+    return d.toLocaleString('es-CL', full ? { dateStyle: 'long', timeStyle: 'short' } : { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+  function labelOrigen(o: string) {
+    return ({ home_form: 'Form Home', cotizar: 'Cotizar', diagnostico: 'Diagnóstico', web: 'Web' } as any)[o] || o || '—';
+  }
+  function urgencia(u: string) {
+    if (!u) return '<span class="cell-sub">—</span>';
+    const map: any = { alta: ['🔴', 'Alta'], media: ['🟡', 'Media'], baja: ['🟢', 'Baja'] };
+    const [dot, txt] = map[u] || ['', u];
+    return `<span class="urg">${dot} ${txt}</span>`;
+  }
+  function esc(s: string) {
+    return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+  }
+
+  init();
+</script>

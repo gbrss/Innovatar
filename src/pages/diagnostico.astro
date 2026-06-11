@@ -1,0 +1,232 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+---
+
+<Layout title="Diagnóstico Inteligente — Innovatar" description="Describe tu necesidad y nuestro sistema clasifica la solución ideal para ti.">
+  <Header />
+  <main class="diag-page">
+    <div class="bg grid-bg"></div>
+    <div class="container">
+      <span class="eyebrow"><span class="dot"></span>Diagnóstico Inteligente</span>
+      <h1>Descríbenos qué necesitas</h1>
+      <p class="lead">No tienes que saber el nombre técnico. Escríbelo como se lo contarías a un amigo.</p>
+
+      <div class="progress"><span id="bar"></span></div>
+      <span class="step-label" id="step-label">Paso 1 de 3 — Cuéntanos tu situación</span>
+
+      <!-- PASO 1 -->
+      <div class="panel" id="panel-1">
+        <textarea id="diag-text" rows="4" placeholder='Ej: "Tengo una empresa de transporte con 8 camiones. No sé dónde están y el mes pasado me robaron uno. Tampoco hay internet en mis bodegas..."'></textarea>
+        <div class="examples">
+          <strong>Ejemplos:</strong>
+          <span>"Quiero cámaras para mi local"</span>
+          <span>"Parcela sin internet"</span>
+          <span>"Rastrear mis vehículos"</span>
+        </div>
+        <button class="btn-primary" id="to-2" style="padding:14px 28px">⚡ Analizar mi caso →</button>
+      </div>
+
+      <!-- PASO 2 -->
+      <div class="panel" id="panel-2" hidden>
+        <div class="detected" id="detected"></div>
+        <label class="field">¿Con qué urgencia lo necesitas?
+          <div class="radios" id="urgencia">
+            <label><input type="radio" name="urg" value="alta" /> 🔴 Alta — esta semana</label>
+            <label><input type="radio" name="urg" value="media" checked /> 🟡 Media — 2-4 semanas</label>
+            <label><input type="radio" name="urg" value="baja" /> 🟢 Baja — estoy evaluando</label>
+          </div>
+        </label>
+        <div class="nav-btns">
+          <button class="btn-ghost" data-back="1">← Volver</button>
+          <button class="btn-primary" id="to-3">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="panel" id="panel-3" hidden>
+        <p class="mini">Solo necesitamos 3 datos para contactarte.</p>
+        <label class="field">Nombre<input type="text" id="d-nombre" placeholder="Tu nombre" /></label>
+        <label class="field">WhatsApp o teléfono<input type="tel" id="d-fono" placeholder="+56 9 ..." /></label>
+        <label class="field">¿En qué región estás?
+          <select id="d-region">
+            <option>Región Metropolitana</option><option>Valparaíso</option><option>Biobío</option>
+            <option>Maule</option><option>Araucanía</option><option>Otra</option>
+          </select>
+        </label>
+        <div class="nav-btns">
+          <button class="btn-ghost" data-back="2">← Volver</button>
+          <button class="btn-primary" id="submit">Crear mi solicitud →</button>
+        </div>
+      </div>
+
+      <!-- ÉXITO -->
+      <div class="panel success" id="panel-success" hidden>
+        <span class="big-check">✅</span>
+        <h2>¡Solicitud creada con éxito!</h2>
+        <p>Tu número de ticket: <strong id="ticket-num">#INV-0247</strong></p>
+        <div class="success-summary" id="summary"></div>
+        <p class="mini">Un ejecutivo te contactará en menos de 2 horas hábiles por WhatsApp.</p>
+        <a href="https://wa.me/56949981427" class="btn-whatsapp" target="_blank" rel="noopener" style="margin-top:8px">💬 Seguir por WhatsApp →</a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+  <WhatsAppFloat />
+</Layout>
+
+<style>
+  .diag-page { padding-top: 72px; position: relative; min-height: 100vh; }
+  .bg { position: absolute; inset: 0; opacity: 0.5; pointer-events: none;
+    mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, black, transparent); }
+  .container { max-width: 680px; margin: 0 auto; padding: 64px 24px 96px; position: relative; z-index: 1; }
+  h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.03em; margin: 20px 0 12px; }
+  .lead { color: var(--c-text-muted); font-size: 1.1rem; margin-bottom: 36px; }
+
+  .progress { height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+  .progress span { display: block; height: 100%; width: 33%;
+    background: linear-gradient(90deg, #0EA5E9, #38BDF8); transition: width 0.4s ease; }
+  .step-label { display: block; font-size: 0.8rem; color: var(--c-text-muted); margin: 12px 0 28px; font-weight: 600; }
+
+  .panel { display: flex; flex-direction: column; gap: 20px; }
+  textarea, input, select {
+    width: 100%; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(14,165,233,0.22); border-radius: 12px;
+    padding: 16px; color: #fff; font-family: inherit; font-size: 1rem; line-height: 1.5;
+  }
+  textarea { resize: vertical; min-height: 120px; }
+  textarea:focus, input:focus, select:focus { outline: none; border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px rgba(14,165,233,0.12); }
+  select option { background: #0A1428; }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.85rem; color: var(--c-text-muted); }
+  .examples span { background: rgba(255,255,255,0.05); border: 1px solid var(--c-border); border-radius: 6px; padding: 4px 10px; }
+  .btn-primary { align-self: flex-start; }
+
+  .field { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.75); }
+  .radios { display: flex; flex-direction: column; gap: 10px; font-weight: 400; }
+  .radios label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .radios input { width: auto; }
+  .detected { display: flex; flex-direction: column; gap: 10px; }
+  .detected .det-item { display: flex; align-items: center; gap: 12px; background: rgba(14,165,233,0.08);
+    border: 1px solid rgba(14,165,233,0.2); border-radius: 12px; padding: 14px 16px; }
+  .nav-btns { display: flex; justify-content: space-between; gap: 12px; }
+  .mini { color: var(--c-text-muted); font-size: 0.95rem; }
+
+  .success { align-items: center; text-align: center; }
+  .big-check { font-size: 3.5rem; }
+  .success h2 { font-size: 1.8rem; font-weight: 800; }
+  #ticket-num { color: var(--color-accent); }
+  .success-summary { display: flex; flex-direction: column; gap: 8px; width: 100%;
+    background: var(--color-ink-card); border: 1px solid var(--c-border); border-radius: 12px; padding: 16px; }
+</style>
+
+<script>
+  // ── Fase 1: clasificación por reglas. Fase 3: reemplazar por agente IA. ──
+  const RULES: Record<string, string[]> = {
+    'Internet Satelital Starlink': ['internet', 'starlink', 'señal', 'conexión', 'wifi rural', 'sin cobertura', 'parcela', 'campo', 'rural'],
+    'Cámaras de Seguridad': ['cámara', 'camara', 'seguridad', 'vigilancia', 'robo', 'cctv', 'grabar'],
+    'GPS & Rastreo de Flotas': ['gps', 'camión', 'camion', 'flota', 'vehículo', 'vehiculo', 'rastreo', 'ubicación', 'conductor'],
+    'Redes & WiFi': ['red', 'wifi', 'cableado', 'fibra', 'router', 'lento'],
+    'Automatización & IA': ['automatizar', 'automatización', 'ia', 'cotización', 'proceso', 'reporte'],
+    'Soporte Técnico': ['soporte', 'ayuda', 'reparar', 'falla', 'no funciona'],
+  };
+
+  const state = { text: '', detected: [] as string[], urgencia: 'media' };
+
+  const $ = (id: string) => document.getElementById(id)!;
+  const panels = [$('panel-1'), $('panel-2'), $('panel-3')];
+  const bar = $('bar') as HTMLElement;
+  const stepLabel = $('step-label');
+
+  function show(step: number) {
+    panels.forEach((p, i) => (p.hidden = i !== step - 1));
+    $('panel-success').hidden = true;
+    bar.style.width = `${step * 33}%`;
+    const labels = ['Paso 1 de 3 — Cuéntanos tu situación', 'Paso 2 de 3 — Verificar necesidades', 'Paso 3 de 3 — ¿A quién avisamos?'];
+    stepLabel.textContent = labels[step - 1];
+  }
+
+  function classify(text: string): string[] {
+    const lower = text.toLowerCase();
+    const hits = Object.entries(RULES)
+      .filter(([, kws]) => kws.some((k) => lower.includes(k)))
+      .map(([service]) => service);
+    return hits.length ? hits : ['Soporte Técnico'];
+  }
+
+  // Prefill desde ?q= (viene del banner del Home)
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get('q');
+  if (q) ($('diag-text') as HTMLTextAreaElement).value = decodeURIComponent(q);
+
+  $('to-2').addEventListener('click', () => {
+    state.text = ($('diag-text') as HTMLTextAreaElement).value.trim();
+    if (!state.text) { ($('diag-text') as HTMLTextAreaElement).focus(); return; }
+    state.detected = classify(state.text);
+    const box = $('detected');
+    box.innerHTML = '<p class="mini">🤖 Detectamos que podrías necesitar:</p>' +
+      state.detected.map((s) => `<div class="det-item"><strong>${s}</strong></div>`).join('');
+    show(2);
+  });
+
+  $('to-3').addEventListener('click', () => {
+    const sel = document.querySelector<HTMLInputElement>('input[name="urg"]:checked');
+    state.urgencia = sel?.value || 'media';
+    show(3);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-back]').forEach((b) =>
+    b.addEventListener('click', () => show(Number(b.dataset.back)))
+  );
+
+  $('submit').addEventListener('click', async () => {
+    const nombre = ($('d-nombre') as HTMLInputElement).value.trim();
+    const fono = ($('d-fono') as HTMLInputElement).value.trim();
+    const region = ($('d-region') as HTMLSelectElement).value;
+    const urgLabel = { alta: '🔴 Alta', media: '🟡 Media', baja: '🟢 Baja' }[state.urgencia];
+    const ticket = '#INV-' + Math.floor(1000 + Math.random() * 9000);
+
+    // 1) Persistir el lead/ticket en Supabase
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre,
+          telefono: fono,
+          region,
+          servicios: state.detected,
+          descripcion: state.text,
+          urgencia: state.urgencia,
+          origen: 'diagnostico',
+        }),
+      });
+    } catch (err) {
+      console.error('No se pudo guardar el ticket:', err);
+    }
+
+    // 2) Abrir WhatsApp con el ticket
+    const waNumber = '56949981427';
+    const msg =
+      `Hola Innovatar 👋, completé el Diagnóstico Inteligente.\n\n` +
+      `*Ticket:* ${ticket}\n` +
+      `*Nombre:* ${nombre}\n` +
+      `*WhatsApp:* ${fono}\n` +
+      `*Región:* ${region}\n` +
+      `*Urgencia:* ${urgLabel}\n` +
+      `*Necesidades detectadas:* ${state.detected.join(', ')}\n\n` +
+      `*Lo que describí:* ${state.text}`;
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+
+    panels.forEach((p) => (p.hidden = true));
+    bar.style.width = '100%';
+    stepLabel.textContent = '';
+    $('panel-success').hidden = false;
+    $('ticket-num').textContent = ticket;
+    $('summary').innerHTML = state.detected.map((s) => `<div>${s} <span style="float:right">${urgLabel}</span></div>`).join('');
+  });
+
+  show(1);
+</script>

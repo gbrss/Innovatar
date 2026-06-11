@@ -1,0 +1,76 @@
+---
+const steps = [
+  { n: '01', icon: 'M21 21l-4.3-4.3 M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
+    title: 'Diagnóstico', text: 'Describes tu necesidad y nuestro equipo evalúa la mejor solución para tu caso.' },
+  { n: '02', icon: 'M9 11H5a1 1 0 0 0-1 1v8h16V8a1 1 0 0 0-1-1h-4 M9 7h6 M9 11h6 M9 15h6 M9 3h6v4H9z',
+    title: 'Cotización', text: 'En menos de 24h te enviamos una cotización detallada, sin costo ni compromiso.' },
+  { n: '03', icon: 'M14.7 6.3a4 4 0 0 0-5.6 5.6L3 18v3h3l6.1-6.1a4 4 0 0 0 5.6-5.6l-2.5 2.5-2-2z',
+    title: 'Instalación', text: 'Nuestro equipo instala profesionalmente en el plazo acordado, dejando todo operativo.' },
+  { n: '04', icon: 'M16 18a4 4 0 0 0-8 0 M12 14a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M17 11h.01 M21 14a8 8 0 0 0-8-8',
+    title: 'Soporte continuo', text: 'Mesa de ayuda, mantención y actualizaciones incluidas. No te dejamos solo.' },
+];
+---
+
+<section class="section">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <span class="eyebrow"><span class="dot"></span>Metodología</span>
+      <h2>Cómo trabajamos contigo</h2>
+    </div>
+
+    <div class="steps">
+      {steps.map((s, i) => (
+        <div class="step" data-reveal style={`transition-delay:${i * 90}ms`}>
+          <div class="step-top">
+            <span class="step-num">{s.n}</span>
+            <div class="step-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0EA5E9" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d={s.icon}/></svg>
+            </div>
+          </div>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="cta-row" data-reveal>
+      <a href="/cotizar" class="btn-primary">Comenzar ahora →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section { padding: 96px 40px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  .head { text-align: center; margin-bottom: 56px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .head h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; }
+
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .step {
+    background: var(--color-ink-card);
+    border: 1px solid var(--c-border);
+    border-top: 2px solid rgba(14,165,233,0.4);
+    border-radius: 16px;
+    padding: 28px 24px;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .step:hover { transform: translateY(-4px); border-top-color: var(--color-accent); }
+  .step-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .step-num { font-size: 2rem; font-weight: 900; color: rgba(14,165,233,0.25); letter-spacing: -0.04em; }
+  .step-icon {
+    width: 44px; height: 44px; border-radius: 11px;
+    background: linear-gradient(135deg, rgba(14,165,233,0.16), rgba(14,165,233,0.05));
+    border: 1px solid rgba(14,165,233,0.2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+  .step p { color: var(--c-text-muted); font-size: 0.9rem; line-height: 1.55; }
+
+  .cta-row { text-align: center; margin-top: 48px; }
+
+  @media (max-width: 980px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) {
+    .section { padding: 64px 24px; }
+    .steps { grid-template-columns: 1fr; }
+  }
+</style>

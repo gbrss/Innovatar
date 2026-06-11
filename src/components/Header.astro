@@ -1,0 +1,155 @@
+---
+const navItems = [
+  { label: 'Servicios', href: '/servicios', dropdown: true },
+  { label: 'Soluciones', href: '/soluciones', dropdown: true },
+  { label: 'Casos', href: '/casos-de-exito', dropdown: false },
+  { label: 'Mesa de Ayuda', href: '/mesa-de-ayuda', dropdown: false },
+  { label: 'Blog', href: '/blog', dropdown: false },
+];
+---
+
+<header id="site-header" class="reveal">
+  <div class="header-inner">
+    <!-- Logo -->
+    <a href="/" class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round">
+          <path d="M5 12a7 7 0 0 1 7-7M9 12a3 3 0 0 1 3-3" />
+          <circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none" />
+        </svg>
+      </span>
+      <span class="logo-text">INNOVA<span class="logo-accent">TAR</span></span>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="nav-desktop">
+      {navItems.map((item) => (
+        <a href={item.href} class="nav-link">
+          {item.label}{item.dropdown && <span class="caret">▾</span>}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Desktop CTAs -->
+    <div class="header-ctas">
+      <a href="/diagnostico" class="btn-ghost btn-sm">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0EA5E9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
+        Diagnóstico IA
+      </a>
+      <a href="/cotizar" class="btn-primary btn-sm">Cotizar →</a>
+    </div>
+
+    <!-- Mobile toggle -->
+    <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="mobile-menu">
+    {navItems.map((item) => (
+      <a href={item.href} class="mobile-link">{item.label}</a>
+    ))}
+    <div class="mobile-cta-group">
+      <a href="/diagnostico" class="btn-ghost" style="width:100%; justify-content:center;">⚡ Diagnóstico Inteligente</a>
+      <a href="/cotizar" class="btn-primary" style="width:100%; justify-content:center;">Cotiza tu proyecto →</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  #site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(6, 11, 23, 0.82);
+    backdrop-filter: blur(24px) saturate(160%);
+    border-bottom: 1px solid var(--c-border);
+    transition: background 0.25s, box-shadow 0.25s;
+  }
+  #site-header.scrolled {
+    background: rgba(6, 11, 23, 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  .header-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 0 40px;
+  }
+  .logo { display: flex; align-items: center; gap: 9px; flex-shrink: 0; text-decoration: none; }
+  .logo-mark {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, #0EA5E9, #0369A1);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.45);
+  }
+  .logo-text { font-weight: 900; font-size: 1rem; letter-spacing: -0.03em; color: #fff; }
+  .logo-accent { color: #0EA5E9; }
+
+  .nav-desktop { display: flex; align-items: center; gap: 28px; flex: 1; }
+  .nav-link {
+    color: var(--c-text-muted);
+    font-size: 0.875rem; font-weight: 500;
+    text-decoration: none;
+    transition: color 0.18s;
+    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .nav-link:hover { color: #fff; }
+  .caret { font-size: 0.7rem; opacity: 0.5; }
+
+  .header-ctas { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn-sm { padding: 8px 16px; font-size: 0.82rem; }
+
+  .menu-toggle {
+    display: none;
+    background: none; border: none; cursor: pointer;
+    margin-left: auto; padding: 4px;
+  }
+
+  .mobile-menu {
+    display: none;
+    flex-direction: column;
+    padding: 16px 24px 28px;
+    border-top: 1px solid var(--c-border);
+    background: rgba(6, 11, 23, 0.98);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 1rem; font-weight: 600;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .mobile-cta-group { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+
+  @media (max-width: 900px) {
+    .nav-desktop, .header-ctas { display: none; }
+    .menu-toggle { display: block; }
+    .header-inner { padding: 0 20px; }
+  }
+</style>
+
+<script>
+  // Sticky scroll state
+  const header = document.getElementById('site-header');
+  const onScroll = () => {
+    if (window.scrollY > 40) header?.classList.add('scrolled');
+    else header?.classList.remove('scrolled');
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Mobile menu toggle
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => menu?.classList.toggle('open'));
+  menu?.querySelectorAll('a').forEach((link) =>
+    link.addEventListener('click', () => menu.classList.remove('open'))
+  );
+</script>

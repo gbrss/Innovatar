@@ -1,0 +1,150 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+
+const segmentos = ['Empresa / PYME', 'Colegio / Institución', 'Constructora', 'Parcela / Campo', 'Transportes / Flotas', 'Residencial', 'Otro'];
+const servicios = ['Starlink / Internet Satelital', 'Cámaras de Seguridad', 'GPS & Rastreo de Flotas', 'Redes & WiFi', 'Automatización & IA', 'Soporte Técnico'];
+const waNumber = '56949981427';
+---
+
+<Layout title="Cotiza tu proyecto — Innovatar" description="Cotización sin costo. Te contactamos en menos de 24 horas.">
+  <Header />
+  <main class="cotizar">
+    <div class="bg grid-bg"></div>
+    <div class="container">
+      <span class="eyebrow"><span class="dot"></span>Cotización sin costo</span>
+      <h1>Cuéntanos sobre tu proyecto</h1>
+      <p class="lead">Completa el formulario y nuestro equipo te contactará en menos de 24 horas.</p>
+
+      <form class="form-card" id="cotizar-form" data-wa={waNumber}>
+        <div class="field">
+          <span class="field-label">¿Qué tipo de organización eres?</span>
+          <div class="grid-options">
+            {segmentos.map((s) => (
+              <label class="opt"><input type="radio" name="segmento" value={s} /> <span>{s}</span></label>
+            ))}
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">¿Qué necesitas? (puedes elegir varios)</span>
+          <div class="grid-options">
+            {servicios.map((s) => (
+              <label class="opt"><input type="checkbox" name="servicio" value={s} /> <span>{s}</span></label>
+            ))}
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="field">Nombre<input type="text" name="nombre" placeholder="Tu nombre" required /></label>
+          <label class="field">Empresa<input type="text" name="empresa" placeholder="Opcional" /></label>
+        </div>
+        <div class="row">
+          <label class="field">WhatsApp<input type="tel" name="telefono" placeholder="+56 9 ..." required /></label>
+          <label class="field">Email<input type="email" name="email" placeholder="tu@email.cl" /></label>
+        </div>
+        <label class="field">Cuéntanos más (opcional)
+          <textarea name="mensaje" rows="3" placeholder="Detalles de tu proyecto, ubicación, plazos..."></textarea>
+        </label>
+
+        <button type="submit" class="btn-primary" style="justify-content:center; padding:15px">Enviar cotización →</button>
+        <p class="note">✓ Sin costo · Sin compromiso · Respuesta en menos de 24h</p>
+      </form>
+
+      <div class="form-card success" id="ok" hidden>
+        <span class="big">✅</span>
+        <h2>¡Casi listo!</h2>
+        <p>Abrimos WhatsApp con tu cotización. Solo presiona enviar y te responderemos con tu propuesta.</p>
+      </div>
+    </div>
+  </main>
+  <Footer />
+  <WhatsAppFloat />
+</Layout>
+
+<style>
+  .cotizar { padding-top: 72px; position: relative; min-height: 100vh; }
+  .bg { position: absolute; inset: 0; opacity: 0.5; pointer-events: none;
+    mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, black, transparent); }
+  .container { max-width: 720px; margin: 0 auto; padding: 64px 24px 96px; position: relative; z-index: 1; }
+  h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.03em; margin: 20px 0 12px; }
+  .lead { color: var(--c-text-muted); font-size: 1.1rem; margin-bottom: 36px; }
+
+  .form-card { background: var(--color-ink-card); border: 1px solid var(--c-border);
+    border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 24px;
+    backdrop-filter: blur(16px); }
+  .field { display: flex; flex-direction: column; gap: 10px; }
+  .field-label { font-size: 0.9rem; font-weight: 700; }
+  .grid-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .opt { display: flex; align-items: center; gap: 10px; cursor: pointer;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px 14px; font-size: 0.9rem;
+    transition: border-color 0.2s, background 0.2s; }
+  .opt:hover { border-color: rgba(14,165,233,0.3); }
+  .opt input:checked + span { color: #38BDF8; font-weight: 600; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  label.field { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+  input, textarea, select { background: rgba(255,255,255,0.04); border: 1px solid var(--c-border);
+    border-radius: 10px; padding: 12px 14px; color: #fff; font-family: inherit; font-size: 0.95rem; width: 100%; }
+  input:focus, textarea:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(14,165,233,0.12); }
+  textarea { resize: vertical; }
+  .note { text-align: center; font-size: 0.8rem; color: var(--c-text-muted); }
+
+  .success { align-items: center; text-align: center; }
+  .big { font-size: 3rem; }
+  .success h2 { font-size: 1.6rem; font-weight: 800; }
+  .success p { color: var(--c-text-muted); }
+
+  @media (max-width: 560px) {
+    .grid-options, .row { grid-template-columns: 1fr; }
+    .form-card { padding: 24px; }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('cotizar-form') as HTMLFormElement | null;
+  const ok = document.getElementById('ok');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const segmento = String(data.get('segmento') || '');
+    const servicios = data.getAll('servicio').map(String);
+    const nombre = String(data.get('nombre') || '').trim();
+    const empresa = String(data.get('empresa') || '').trim();
+    const telefono = String(data.get('telefono') || '').trim();
+    const email = String(data.get('email') || '').trim();
+    const mensaje = String(data.get('mensaje') || '').trim();
+    const wa = form.dataset.wa || '56949981427';
+
+    // 1) Persistir el lead completo en Supabase
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, empresa, telefono, email, segmento, servicios, mensaje, origen: 'cotizar' }),
+      });
+    } catch (err) {
+      console.error('No se pudo guardar el lead:', err);
+    }
+
+    // 2) Abrir WhatsApp con el resumen
+    const msg =
+      `Hola Innovatar 👋, quiero cotizar un proyecto.\n\n` +
+      `*Nombre:* ${nombre}\n` +
+      (empresa ? `*Empresa:* ${empresa}\n` : '') +
+      `*WhatsApp:* ${telefono}\n` +
+      (email ? `*Email:* ${email}\n` : '') +
+      `*Tipo de organización:* ${segmento || 'No especificado'}\n` +
+      `*Servicios de interés:* ${servicios.join(', ') || 'No especificado'}\n` +
+      (mensaje ? `*Detalle:* ${mensaje}` : '');
+    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
+
+    form.style.display = 'none';
+    if (ok) ok.hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>

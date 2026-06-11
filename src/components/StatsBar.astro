@@ -1,0 +1,97 @@
+---
+const stats = [
+  { value: 200, prefix: '+', suffix: '', label: 'Proyectos ejecutados' },
+  { value: 13,  prefix: '+', suffix: '', label: 'Regiones cubiertas' },
+  { value: 8,   prefix: '+', suffix: ' años', label: 'de trayectoria' },
+  { value: null, text: '24/7', label: 'Soporte técnico' },
+];
+---
+
+<section id="stats" class="stats">
+  <div class="stats-glow"></div>
+  <div class="stats-inner">
+    {stats.map((s) => (
+      <div class="stat">
+        {s.value !== null ? (
+          <span class="stat-num">
+            {s.prefix}<span class="counter" data-target={s.value}>0</span>{s.suffix}
+          </span>
+        ) : (
+          <span class="stat-num gradient-text">{s.text}</span>
+        )}
+        <span class="stat-label">{s.label}</span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .stats {
+    background: var(--color-ink-soft);
+    border-top: 1px solid var(--c-border);
+    border-bottom: 1px solid var(--c-border);
+    padding: 36px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stats-glow { position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 60% 100% at 50% 50%, rgba(14,165,233,0.04) 0%, transparent 70%); }
+  .stats-inner {
+    max-width: 1000px; margin: 0 auto;
+    display: flex; align-items: center;
+    position: relative; z-index: 1;
+  }
+  .stat { flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 4px; padding: 8px 16px; position: relative; }
+  .stat + .stat::before {
+    content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 36px; background: rgba(255,255,255,0.08);
+  }
+  .stat-num {
+    font-size: 2.6rem; font-weight: 900; color: var(--color-accent);
+    letter-spacing: -0.04em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-num .counter { font-variant-numeric: tabular-nums; }
+  .stat-label {
+    font-size: 0.75rem; font-weight: 600; color: var(--c-text-muted);
+    letter-spacing: 0.06em; text-transform: uppercase; text-align: center;
+  }
+
+  @media (max-width: 720px) {
+    .stats-inner { flex-wrap: wrap; gap: 24px 0; }
+    .stat { flex: 0 0 50%; }
+    .stat:nth-child(3)::before, .stat:nth-child(2)::before { display: none; }
+    .stat-num { font-size: 2.1rem; }
+  }
+</style>
+
+<script>
+  function animateCounter(el: HTMLElement, target: number, duration = 2200) {
+    const start = performance.now();
+    const step = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 4);
+      el.textContent = String(Math.round(ease * target));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  const section = document.getElementById('stats');
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          document.querySelectorAll<HTMLElement>('.counter').forEach((el) => {
+            const target = Number(el.dataset.target || 0);
+            animateCounter(el, target);
+          });
+          observer.disconnect();
+        }
+      });
+    },
+    { threshold: 0.4 }
+  );
+  if (section) observer.observe(section);
+</script>
