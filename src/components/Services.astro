@@ -1,0 +1,115 @@
+---
+const services = [
+  { slug: 'starlink', tag: 'Starlink',
+    icon: 'M5 12a7 7 0 0 1 7-7M9 12a3 3 0 0 1 3-3 M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
+    title: 'Internet Satelital Starlink',
+    text: 'Internet satelital de alta velocidad donde el cable no llega. Parcelas, faenas y zonas rurales.',
+    segments: ['🏡', '🏗', '🌾'] },
+  { slug: 'camaras-seguridad', tag: 'Cámaras',
+    icon: 'M3 7h4l2-2h6l2 2h4v12H3z M12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+    title: 'Cámaras de Seguridad',
+    text: 'CCTV HD para empresas, colegios, bodegas y condominios. Acceso remoto desde tu móvil.',
+    segments: ['🏢', '🏫', '🏭'] },
+  { slug: 'gps-flotas', tag: 'GPS & Flotas',
+    icon: 'M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z M12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+    title: 'GPS & Flotas',
+    text: 'Control en tiempo real de tus vehículos, camiones y maquinaria en todo Chile.',
+    segments: ['🚛', '🏗', '🏢'] },
+  { slug: 'redes-wifi', tag: 'Redes & WiFi',
+    icon: 'M5 13a10 10 0 0 1 14 0 M8.5 16.5a5 5 0 0 1 7 0 M12 20h.01',
+    title: 'Redes & WiFi',
+    text: 'Diseño e instalación de redes empresariales de alto rendimiento, WiFi, cableado y fibra óptica.',
+    segments: ['🏢', '🏫', '🏭'] },
+  { slug: 'automatizacion-ia', tag: 'Automatización IA',
+    icon: 'M12 8V4H8 M4 8h16v12H4z M2 14h2 M20 14h2 M9 14v2 M15 14v2',
+    title: 'Automatización & IA',
+    text: 'Automatizamos procesos con IA: cotizaciones, atención al cliente, reportes y flujos operativos.',
+    segments: ['🏢', '🛒', '🏥'] },
+  { slug: 'soporte-tecnico', tag: 'Soporte Técnico',
+    icon: 'M14.7 6.3a4 4 0 0 0-5.6 5.6L3 18v3h3l6.1-6.1a4 4 0 0 0 5.6-5.6l-2.5 2.5-2-2z',
+    title: 'Soporte Técnico',
+    text: 'Mesa de ayuda, mantención preventiva y soporte remoto para todos los sistemas que instalamos.',
+    segments: ['Todos'] },
+];
+---
+
+<section class="section services">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <span class="eyebrow"><span class="dot"></span>Lo que hacemos</span>
+      <h2>Nuestros servicios</h2>
+    </div>
+
+    <div class="grid">
+      {services.map((s, i) => (
+        <a href={`/servicios/${s.slug}`} class="card" data-reveal style={`transition-delay:${(i % 3) * 80}ms`}>
+          <div class="card-top">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0EA5E9" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d={s.icon}/></svg>
+            </div>
+          </div>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+          <div class="card-foot">
+            <span class="segments">{s.segments.map((seg) => <span>{seg}</span>)}</span>
+            <span class="card-link">Ver servicio
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <div class="cta-row" data-reveal>
+      <a href="/servicios" class="btn-ghost">Ver todos los servicios →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .services { background: var(--color-ink-soft); }
+  .section { padding: 96px 40px; position: relative; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  .head { text-align: center; margin-bottom: 52px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .head h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card {
+    background: var(--color-ink-card);
+    border: 1px solid var(--c-border);
+    border-radius: 18px;
+    padding: 28px;
+    text-decoration: none;
+    color: inherit;
+    display: flex; flex-direction: column;
+    transition: border-color 0.3s, transform 0.3s, background 0.3s;
+  }
+  .card:hover { border-color: rgba(14,165,233,0.3); transform: translateY(-5px);
+    background: rgba(14,165,233,0.04); }
+  .card-icon {
+    width: 52px; height: 52px; border-radius: 13px;
+    background: linear-gradient(135deg, rgba(14,165,233,0.16), rgba(14,165,233,0.05));
+    border: 1px solid rgba(14,165,233,0.2);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 22px;
+    transition: transform 0.3s;
+  }
+  .card:hover .card-icon { transform: scale(1.08) rotate(-3deg); }
+  .card h3 { font-size: 1.22rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em; }
+  .card p { color: var(--c-text-muted); font-size: 0.92rem; line-height: 1.6; flex: 1; margin-bottom: 22px; }
+  .card-foot { display: flex; align-items: center; justify-content: space-between;
+    padding-top: 18px; border-top: 1px solid var(--c-border); }
+  .segments { display: flex; gap: 4px; font-size: 1.05rem; }
+  .card-link { display: inline-flex; align-items: center; gap: 5px;
+    color: var(--color-accent); font-size: 0.85rem; font-weight: 700;
+    transition: gap 0.2s; }
+  .card:hover .card-link { gap: 9px; }
+
+  .cta-row { text-align: center; margin-top: 44px; }
+
+  @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 680px) {
+    .section { padding: 64px 24px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>

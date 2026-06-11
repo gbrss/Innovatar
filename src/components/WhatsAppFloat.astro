@@ -1,0 +1,61 @@
+---
+const waNumber = '56949981427';
+const waText = encodeURIComponent('Hola, quiero información sobre los servicios de Innovatar.');
+const waLink = `https://wa.me/${waNumber}?text=${waText}`;
+---
+
+<!-- Floating WhatsApp (desktop + mobile) -->
+<a href={waLink} class="wa-float" target="_blank" rel="noopener" aria-label="Hablar por WhatsApp">
+  <svg viewBox="0 0 24 24" width="26" height="26" fill="#fff"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.1 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3 1 2.6 1.1 2.7.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.7.5-.1 1.4-.6 1.6-1.2.2-.5.2-1 .1-1.1-.1-.1-.2-.1-.4-.2z"/></svg>
+</a>
+
+<!-- Mobile bottom bar -->
+<nav class="mobile-bar">
+  <a href="/diagnostico">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
+    Diagnóstico
+  </a>
+  <a href={waLink} target="_blank" rel="noopener" class="wa">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2z"/></svg>
+    WhatsApp
+  </a>
+  <a href="/cotizar" class="primary">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H5a1 1 0 0 0-1 1v8h16V8a1 1 0 0 0-1-1h-4M9 3h6v4H9z"/></svg>
+    Cotizar
+  </a>
+</nav>
+
+<style>
+  .wa-float {
+    position: fixed; bottom: 24px; right: 24px; z-index: 90;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #25D366, #1DA851);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 28px rgba(37,211,102,0.45);
+    transition: transform 0.2s; text-decoration: none;
+  }
+  .wa-float:hover { transform: scale(1.08); }
+
+  .mobile-bar { display: none; }
+
+  @media (max-width: 900px) {
+    .wa-float { display: none; }
+    .mobile-bar {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 95;
+      background: rgba(6,11,23,0.96); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--c-border);
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    }
+    .mobile-bar a {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 4px; border-radius: 10px;
+      color: rgba(255,255,255,0.65); text-decoration: none;
+      font-size: 0.7rem; font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+    .mobile-bar a:active { background: rgba(255,255,255,0.06); }
+    .mobile-bar .wa { color: #25D366; }
+    .mobile-bar .primary { color: #38BDF8; }
+  }
+</style>

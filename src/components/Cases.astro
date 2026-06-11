@@ -1,0 +1,117 @@
+---
+const cases = [
+  { tag: '🏡 Parcela · Maule', title: 'Conectividad en zona rural sin cobertura',
+    challenge: 'Parcela de 80 hectáreas a 40 km del pueblo más cercano. Cero internet.',
+    services: ['Starlink', 'Soporte remoto'],
+    results: ['100 Mbps estables', 'Instalado en 2 días'],
+    quote: 'Por fin tenemos internet real en la parcela.', author: 'Carlos R., propietario' },
+  { tag: '🏫 Colegio · Santiago Sur', title: 'Red WiFi y cámaras para 800 alumnos',
+    challenge: 'El WiFi colapsaba en horario de clases. Cero cámaras en 3 edificios.',
+    services: ['Redes mesh', 'Cámaras HD'],
+    results: ['100% de cobertura', '0 incidentes en 18 meses'],
+    quote: 'La mejor inversión que hicimos para la comunidad.', author: 'Dir. Carlos Méndez' },
+  { tag: '🚛 Transporte · RM', title: 'GPS en flota de 12 camiones',
+    challenge: 'No sabían dónde estaba su flota en ruta. Robaron un camión cargado.',
+    services: ['GPS', 'Telemetría', 'App móvil'],
+    results: ['-23% en combustible', '1 vehículo recuperado'],
+    quote: 'Recuperamos el camión robado en 4 horas.', author: 'Jorge V., gerente' },
+];
+---
+
+<section class="section cases">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <span class="eyebrow"><span class="dot"></span>Casos de éxito</span>
+      <h2>Lo que logramos con nuestros clientes</h2>
+    </div>
+
+    <div class="grid">
+      {cases.map((c, i) => (
+        <article class="case" data-reveal style={`transition-delay:${i * 90}ms`}>
+          <div class="case-img">
+            <span class="case-tag">{c.tag}</span>
+          </div>
+          <div class="case-body">
+            <h3>{c.title}</h3>
+            <div class="case-services">
+              {c.services.map((s) => <span class="chip">{s}</span>)}
+            </div>
+            <p class="case-challenge"><strong>Desafío:</strong> {c.challenge}</p>
+            <div class="case-results">
+              {c.results.map((r) => (
+                <span class="result">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                  {r}
+                </span>
+              ))}
+            </div>
+            <blockquote>"{c.quote}"<cite>{c.author}</cite></blockquote>
+            <a href="/casos-de-exito" class="case-link">Ver caso completo
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="cta-row" data-reveal>
+      <a href="/casos-de-exito" class="btn-ghost">Ver todos los casos →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cases { background: var(--color-ink-soft); }
+  .section { padding: 96px 40px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  .head { text-align: center; margin-bottom: 52px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .head h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .case {
+    background: var(--color-ink-card);
+    border: 1px solid var(--c-border);
+    border-radius: 18px; overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .case:hover { transform: translateY(-5px); border-color: rgba(14,165,233,0.25); }
+  .case-img {
+    height: 150px; position: relative;
+    background: linear-gradient(135deg, #0C1B33, #0A1428);
+    display: flex; align-items: flex-end; padding: 16px;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .case-img::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 70% 30%, rgba(14,165,233,0.15), transparent 60%);
+  }
+  .case-tag {
+    position: relative; z-index: 1;
+    background: rgba(6,11,23,0.7); backdrop-filter: blur(8px);
+    border: 1px solid var(--c-border);
+    padding: 5px 12px; border-radius: 8px;
+    font-size: 0.78rem; font-weight: 600;
+  }
+  .case-body { padding: 24px; display: flex; flex-direction: column; flex: 1; }
+  .case-body h3 { font-size: 1.1rem; font-weight: 700; line-height: 1.3; margin-bottom: 14px; }
+  .case-services { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .case-challenge { color: var(--c-text-muted); font-size: 0.88rem; line-height: 1.55; margin-bottom: 16px; }
+  .case-challenge strong { color: rgba(255,255,255,0.8); }
+  .case-results { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+  .result { display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.88rem; font-weight: 600; color: #34D399; }
+  blockquote { font-style: italic; font-size: 0.88rem; color: rgba(255,255,255,0.7);
+    line-height: 1.5; padding: 14px 0; border-top: 1px solid var(--c-border); margin-bottom: 14px; }
+  blockquote cite { display: block; margin-top: 6px; font-style: normal;
+    font-size: 0.78rem; color: var(--c-text-muted); }
+  .case-link { margin-top: auto; display: inline-flex; align-items: center; gap: 5px;
+    color: var(--color-accent); font-size: 0.85rem; font-weight: 700; text-decoration: none;
+    transition: gap 0.2s; }
+  .case:hover .case-link { gap: 9px; }
+
+  .cta-row { text-align: center; margin-top: 44px; }
+
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; } }
+  @media (max-width: 680px) { .section { padding: 64px 24px; } }
+</style>
