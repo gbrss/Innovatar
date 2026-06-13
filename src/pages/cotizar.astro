@@ -6,7 +6,7 @@ import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 
 const segmentos = ['Empresa / PYME', 'Colegio / Institución', 'Constructora', 'Parcela / Campo', 'Transportes / Flotas', 'Residencial', 'Otro'];
 const servicios = ['Starlink / Internet Satelital', 'Cámaras de Seguridad', 'GPS & Rastreo de Flotas', 'Redes & WiFi', 'Automatización & IA', 'Soporte Técnico'];
-const waNumber = '56949981427';
+const waNumber = '+56926896050';
 ---
 
 <Layout title="Cotiza tu proyecto — Innovatar" description="Cotización sin costo. Te contactamos en menos de 24 horas.">
@@ -118,7 +118,7 @@ const waNumber = '56949981427';
     const telefono = String(data.get('telefono') || '').trim();
     const email = String(data.get('email') || '').trim();
     const mensaje = String(data.get('mensaje') || '').trim();
-    const wa = form.dataset.wa || '56949981427';
+    const wa = form.dataset.wa || '+56926896050';
 
     // 1) Persistir el lead completo en Supabase
     try {

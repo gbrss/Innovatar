@@ -1,6 +1,6 @@
 ---
 const services = ['Starlink / Internet Satelital', 'Cámaras de Seguridad', 'GPS & Flotas', 'Redes & WiFi', 'Automatización & IA', 'Soporte Técnico', 'No estoy seguro / orientación'];
-const waNumber = '56949981427';
+const waNumber = '+56926896050';
 const waText = encodeURIComponent('Hola, quiero información sobre los servicios de Innovatar.');
 ---
 
@@ -110,7 +110,7 @@ const waText = encodeURIComponent('Hola, quiero información sobre los servicios
     const nombre = String(data.get('nombre') || '').trim();
     const telefono = String(data.get('telefono') || '').trim();
     const servicio = String(data.get('servicio') || '').trim();
-    const wa = form.dataset.wa || '56949981427';
+    const wa = form.dataset.wa || '+56926896050';
 
     // 1) Persistir el lead en la base de datos (canal confiable)
     try {
